@@ -1,299 +1,90 @@
-import { useEffect, useState } from "react";
-import {
-  getEvents,
-  getEventById,
-  registerEvent,
-} from "../services/api";
-import AuthModal from "../components/AuthModal";
+import { useState } from "react";
+import BackgroundShapes from "../components/BackgroundShapes";
 
-export default function EventsPage({ role }) {
-  const [events, setEvents] = useState([]);
-  const [selected, setSelected] = useState(null);
-  const [token, setToken] = useState(localStorage.getItem("token"));
-  const [showAuth, setShowAuth] = useState(false);
-  const [showForm, setShowForm] = useState(false);
+export default function EventsPage({ events = [], goBack, onSelectEvent, role }) {
 
-  const username = localStorage.getItem("username");
-  const userRole = localStorage.getItem("role");
+  // 🔥 PAGINATION STATE
+  const [currentPage, setCurrentPage] = useState(1);
+  const eventsPerPage = 3;
 
-  const [form, setForm] = useState({ email: "" });
+  // 🔥 CALCULATE EVENTS
+  const indexOfLast = currentPage * eventsPerPage;
+  const indexOfFirst = indexOfLast - eventsPerPage;
+  const currentEvents = events.slice(indexOfFirst, indexOfLast);
 
-  const [showCreate, setShowCreate] = useState(false);
-  const [newEvent, setNewEvent] = useState({
-    title: "",
-    description: "",
-    date: "",
-    type: "",
-    seatsLeft: "",
-  });
-
-  // ================= FETCH EVENTS =================
-  const fetchEvents = async () => {
-    try {
-      const data = await getEvents();
-      setEvents(data);
-    } catch (err) {
-      console.error(err);
-    }
-  };
-
-  useEffect(() => {
-    fetchEvents();
-  }, []);
-
-  // ================= DETAILS =================
-  const handleDetails = async (id) => {
-    try {
-      const event = await getEventById(id);
-      setSelected(event);
-    } catch (err) {
-      console.error(err);
-    }
-  };
-
-  // ================= LOGOUT =================
-  const handleLogout = () => {
-    localStorage.clear();
-    setToken(null);
-    setSelected(null);
-    setShowForm(false);
-    alert("Logged out");
-  };
-
-  // ================= REGISTER =================
-  const handleRegisterClick = () => {
-    if (!token) {
-      setShowAuth(true);
-      return;
-    }
-    setShowForm(true);
-  };
-
-  const handleFinalRegister = async () => {
-    try {
-      const eventId = selected?.id || selected?._id;
-      await registerEvent(eventId, form.email, token);
-
-      alert("Registration successful!");
-      setShowForm(false);
-      setForm({ email: "" });
-
-      fetchEvents();
-    } catch (err) {
-      alert(err.message);
-    }
-  };
-
-  // ================= CREATE =================
-  const handleCreateEvent = async () => {
-    try {
-      await fetch("http://localhost:8080/events", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify(newEvent),
-      });
-
-      alert("Event Created!");
-      setShowCreate(false);
-
-      setNewEvent({
-        title: "",
-        description: "",
-        date: "",
-        type: "",
-        seatsLeft: "",
-      });
-
-      fetchEvents();
-    } catch (err) {
-      alert(err.message);
-    }
-  };
-
-  // ================= DELETE =================
-  const handleDelete = async (id) => {
-    try {
-      await fetch(`http://localhost:8080/events/${id}`, {
-        method: "DELETE",
-        headers: { Authorization: `Bearer ${token}` },
-      });
-
-      alert("Deleted!");
-      fetchEvents();
-    } catch (err) {
-      alert(err.message);
-    }
-  };
-
-  // ================= EDIT =================
-  const handleEdit = (event) => {
-    setNewEvent({
-      title: event.title || "",
-      description: event.description || "",
-      date: event.date ? event.date.slice(0, 16) : "",
-      type: event.type || "",
-      seatsLeft: event.seatsLeft || "",
-    });
-
-    setShowCreate(true);
-  };
+  const totalPages = Math.ceil(events.length / eventsPerPage);
 
   return (
-    <div style={{ padding: "20px" }}>
-      {/* HEADER */}
-      <div style={{ display: "flex", justifyContent: "space-between" }}>
-        <h2>Events</h2>
+    <div className="page">
+      <BackgroundShapes />
 
-        {!token ? (
-          <button onClick={() => setShowAuth(true)}>
-            Login / Signup
-          </button>
-        ) : (
-          <div style={{ display: "flex", gap: "10px" }}>
+      {/* 🔙 BACK */}
+      <button className="back-btn" onClick={goBack}>
+        ← Back
+      </button>
+
+      {/* 🔥 TITLE */}
+      <h2 className="title">Events</h2>
+
+      {/* 🔥 EMPTY STATE */}
+      {events.length === 0 && (
+        <p style={{ textAlign: "center", color: "white" }}>
+          No events available
+        </p>
+      )}
+
+      {/* 🔥 EVENT LIST */}
+      <div className="event-list">
+        {currentEvents.map((e) => (
+          <div className="event-card" key={e.id}>
             <div>
-              {username} ({userRole === "ADMIN" ? "A" : "U"})
+              <h3>{e.title}</h3>
+              <p>{e.description}</p>
             </div>
 
-            <button onClick={handleLogout}>Logout</button>
+            {/* 🔥 CLICKABLE DETAILS */}
+            <button
+              className="primary-btn"
+              onClick={() => onSelectEvent(e)}
+            >
+              See Details →
+            </button>
           </div>
-        )}
+        ))}
       </div>
 
-      {/* ADMIN CREATE */}
-      {userRole === "ADMIN" && (
-        <button onClick={() => setShowCreate(true)}>
-          ➕ Create Event
+      {/* 🔥 PAGINATION */}
+      <div className="pagination">
+
+        <button
+          className="page-btn"
+          disabled={currentPage === 1}
+          onClick={() => setCurrentPage((p) => p - 1)}
+        >
+          ← Prev
         </button>
-      )}
 
-      {/* CREATE FORM */}
-      {showCreate && (
-        <div>
-          <h3>Create Event</h3>
+        <span className="page-info">
+          Page {currentPage} of {totalPages || 1}
+        </span>
 
-          <input
-            placeholder="Title"
-            value={newEvent.title}
-            onChange={(e) =>
-              setNewEvent({ ...newEvent, title: e.target.value })
-            }
-          />
+        <button
+          className="page-btn"
+          disabled={currentPage === totalPages || totalPages === 0}
+          onClick={() => setCurrentPage((p) => p + 1)}
+        >
+          Next →
+        </button>
 
-          <input
-            placeholder="Description"
-            value={newEvent.description}
-            onChange={(e) =>
-              setNewEvent({
-                ...newEvent,
-                description: e.target.value,
-              })
-            }
-          />
+      </div>
 
-          <input
-            type="datetime-local"
-            value={newEvent.date}
-            onChange={(e) =>
-              setNewEvent({ ...newEvent, date: e.target.value })
-            }
-          />
-
-          <input
-            placeholder="Type"
-            value={newEvent.type}
-            onChange={(e) =>
-              setNewEvent({ ...newEvent, type: e.target.value })
-            }
-          />
-
-          <input
-            type="number"
-            placeholder="Seats"
-            value={newEvent.seatsLeft}
-            onChange={(e) =>
-              setNewEvent({
-                ...newEvent,
-                seatsLeft: e.target.value,
-              })
-            }
-          />
-
-          <button onClick={handleCreateEvent}>Save</button>
-        </div>
-      )}
-
-      {/* EVENTS */}
-      {selected === null ? (
-        events.map((e) => {
-          const id = e.id || e._id;
-
-          return (
-            <div key={id}>
-              <h3>{e.title}</h3>
-
-              <button onClick={() => {
-                console.log("CLICKED:", e);
-                setSelected(e);
-              }}>
-                See Details
-              </button>
-
-              {userRole === "ADMIN" && (
-                <>
-                  <button onClick={() => handleEdit(e)}>
-                    Edit
-                  </button>
-                  <button onClick={() => handleDelete(id)}>
-                    Delete
-                  </button>
-                </>
-              )}
-            </div>
-          );
-        })
-      ) : (
-        <div style={{ border: "2px solid black", padding: "20px", marginTop: "20px" }}>
-          <button onClick={() => setSelected(null)}>⬅ Back</button>
-
-          <h1>{selected.title}</h1>
-          <p><b>Description:</b> {selected.description}</p>
-          <p><b>Type:</b> {selected.type}</p>
-          <p><b>Date:</b> {selected.date}</p>
-          <p><b>Seats Left:</b> {selected.seatsLeft}</p>
-
-          <button onClick={handleRegisterClick}>
-            Register
+      {/* 🔥 OPTIONAL ADMIN UI */}
+      {role === "ADMIN" && (
+        <div style={{ textAlign: "center", marginTop: "30px" }}>
+          <button className="primary-btn">
+            + Create Event
           </button>
-
-          {token && showForm && (
-            <>
-              <input
-                placeholder="Email"
-                value={form.email}
-                onChange={(e) =>
-                  setForm({ email: e.target.value })
-                }
-              />
-              <button onClick={handleFinalRegister}>
-                Confirm
-              </button>
-            </>
-          )}
         </div>
-      )}
-
-      {/* AUTH MODAL */}
-      {showAuth && (
-        <AuthModal
-          onClose={() => setShowAuth(false)}
-          setToken={(t) => {
-            setToken(t);
-            localStorage.setItem("token", t);
-          }}
-        />
       )}
     </div>
   );

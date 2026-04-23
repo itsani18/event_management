@@ -2,7 +2,7 @@ import { useState } from "react";
 import { login, signup } from "../services/api";
 import { jwtDecode } from "jwt-decode";
 
-export default function AuthModal({ onClose, setToken }) {
+export default function AuthModal({ onClose, setToken, inline = false }) {
   const [isSignup, setIsSignup] = useState(false);
 
   const [form, setForm] = useState({
@@ -15,14 +15,11 @@ export default function AuthModal({ onClose, setToken }) {
   });
 
   const emailRegex = /^[a-z0-9._%+-]+@gmail\.com$/i;
-
-  // 🔥 PASSWORD RULE
   const passwordRegex =
     /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*?&]).{8,}$/;
 
   const handleSubmit = async () => {
     try {
-      // ================= LOGIN =================
       if (!isSignup) {
         if (!form.username.trim() || !form.password.trim()) {
           alert("Username and Password are required");
@@ -30,84 +27,45 @@ export default function AuthModal({ onClose, setToken }) {
         }
       }
 
-      // ================= SIGNUP =================
       if (isSignup) {
-        if (!form.username.trim()) {
-          alert("Username is required");
-          return;
-        }
+        if (!form.username.trim()) return alert("Username required");
+        if (!form.password.trim()) return alert("Password required");
+        if (!passwordRegex.test(form.password))
+          return alert("Weak password");
 
-        if (!form.password.trim()) {
-          alert("Password is required");
-          return;
-        }
+        if (!form.email.trim()) return alert("Email required");
+        if (!emailRegex.test(form.email))
+          return alert("Invalid email");
 
-        if (!passwordRegex.test(form.password)) {
-          alert(
-            "Password must be 8+ chars, include letter, number & special character"
-          );
-          return;
-        }
-
-        if (!form.email.trim()) {
-          alert("Email is required");
-          return;
-        }
-
-        if (!emailRegex.test(form.email)) {
-          alert("Invalid email format");
-          return;
-        }
-
-        if (!form.firstName.trim()) {
-          alert("First Name is required");
-          return;
-        }
-
-        if (!form.lastName.trim()) {
-          alert("Last Name is required");
-          return;
-        }
-
-        if (!form.role) {
-          alert("Please select a role");
-          return;
-        }
+        if (!form.firstName.trim()) return alert("First name required");
+        if (!form.lastName.trim()) return alert("Last name required");
+        if (!form.role) return alert("Select role");
       }
 
-      // ================= API =================
-      let res;
-      if (isSignup) res = await signup(form);
-      else res = await login(form);
+      let res = isSignup ? await signup(form) : await login(form);
 
       if (res.token) {
         localStorage.setItem("token", res.token);
 
         const decoded = jwtDecode(res.token);
-
         const role =
           decoded.role ||
           decoded.roles ||
           decoded.authorities?.[0];
 
-        if (!role) {
-          alert("Role not found in token");
-          return;
-        }
-
         localStorage.setItem("role", role);
         localStorage.setItem("username", form.username);
 
         setToken(res.token);
-        onClose();
+        onClose && onClose();
       }
     } catch (err) {
-      alert(err.message || "Something went wrong");
+      alert(err.message || "Error");
     }
   };
 
   return (
-    <div className="modal">
+    <div className={inline ? "auth-card" : "modal"}>
       <h2>{isSignup ? "Signup" : "Login"}</h2>
 
       <input
@@ -136,7 +94,6 @@ export default function AuthModal({ onClose, setToken }) {
               setForm({ ...form, email: e.target.value })
             }
           />
-
           <input
             placeholder="First Name"
             value={form.firstName}
@@ -144,7 +101,6 @@ export default function AuthModal({ onClose, setToken }) {
               setForm({ ...form, firstName: e.target.value })
             }
           />
-
           <input
             placeholder="Last Name"
             value={form.lastName}
@@ -152,7 +108,6 @@ export default function AuthModal({ onClose, setToken }) {
               setForm({ ...form, lastName: e.target.value })
             }
           />
-
           <select
             value={form.role}
             onChange={(e) =>
@@ -166,13 +121,13 @@ export default function AuthModal({ onClose, setToken }) {
         </>
       )}
 
-      <button onClick={handleSubmit}>
-        {isSignup ? "Signup" : "Login"}
+      <button className="primary-btn big-btn" onClick={handleSubmit}>
+        {isSignup ? "Signup →" : "Login →"}
       </button>
 
       <p
+        className="switch-text"
         onClick={() => setIsSignup(!isSignup)}
-        style={{ cursor: "pointer", marginTop: "10px" }}
       >
         {isSignup ? "Already have account?" : "Create account"}
       </p>

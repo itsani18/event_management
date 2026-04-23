@@ -1,30 +1,122 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import AuthModal from "./AuthModal";
 
-export default function EventDetails({ event, onRegister }) {
-  const [seats, setSeats] = useState(1);
+export default function EventDetails({ event, onRegister, onBack, token }) {
+
   const [email, setEmail] = useState("");
+  const [showRegisterUI, setShowRegisterUI] = useState(false);
+
+  // 🔥 AUTO FILL EMAIL
+  useEffect(() => {
+    const saved = localStorage.getItem("username");
+    if (saved) setEmail(saved);
+  }, []);
 
   return (
-    <div className="details">
-      <h2>{event.title}</h2>
-      <p>{event.description}</p>
-      <p><b>Time:</b> {event.time}</p>
+    <div className="details-page">
 
-      <h3>Register</h3>
-      <input
-        placeholder="Email"
-        value={email}
-        onChange={(e) => setEmail(e.target.value)}
-      />
-      <input
-        type="number"
-        value={seats}
-        onChange={(e) => setSeats(e.target.value)}
-      />
-
-      <button onClick={() => onRegister({ email, seats })}>
-        Confirm Registration
+      <button className="back-btn" onClick={onBack}>
+        ← Back
       </button>
+
+      <div className="details-container">
+
+        {/* LEFT → EVENT */}
+        <div className="details-card">
+
+          <h1 className="details-title">{event.title}</h1>
+
+          <div className="details-item">
+            <span>📄</span>
+            <div>
+              <p className="label">Description</p>
+              <p>{event.description}</p>
+            </div>
+          </div>
+
+          <div className="details-item">
+            <span>🏷️</span>
+            <div>
+              <p className="label">Type</p>
+              <p>{event.type || "General"}</p>
+            </div>
+          </div>
+
+          <div className="details-item">
+            <span>📅</span>
+            <div>
+              <p className="label">Date</p>
+              <p>{event.date}</p>
+            </div>
+          </div>
+
+          <div className="details-item">
+            <span>👤</span>
+            <div>
+              <p className="label">Seats Left</p>
+              <p>{event.seatsLeft}</p>
+            </div>
+          </div>
+
+          {/* 🔥 REGISTER BUTTON */}
+          {!showRegisterUI && (
+            <button
+              className="primary-btn big-btn"
+              onClick={() => setShowRegisterUI(true)}
+            >
+              Register →
+            </button>
+          )}
+
+        </div>
+
+        {/* 🔥 RIGHT SIDE */}
+        <div className="auth-side">
+
+          {/* 🔥 ONLY SHOW AFTER CLICK */}
+          {showRegisterUI && (
+
+            <>
+              {/* ❌ NOT LOGGED IN */}
+              {!token && (
+                <AuthModal
+                  inline={true}
+                  onClose={() => setShowRegisterUI(false)}
+                  setToken={(t) => {
+                    localStorage.setItem("token", t);
+                     <AuthModal
+                       inline={true}
+                       onClose={() => setShowRegisterUI(false)}
+                       setToken={(t) => {
+                         localStorage.setItem("token", t);
+                         window.location.reload();
+                       }}
+                     />// 🔥 simplest fix
+                  }}
+                />
+              )}
+
+              {/* ✅ LOGGED IN */}
+              {token && (
+                <div className="register-box">
+
+                  <input value={email} disabled />
+
+                  <button
+                    className="primary-btn"
+                    onClick={() => onRegister({ email })}
+                  >
+                    Confirm Registration →
+                  </button>
+
+                </div>
+              )}
+            </>
+          )}
+
+        </div>
+
+      </div>
     </div>
   );
 }
