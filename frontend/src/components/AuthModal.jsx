@@ -14,7 +14,7 @@ export default function AuthModal({ onClose, setToken }) {
     role: "",
   });
 
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  const emailRegex = /^[a-z0-9._%+-]+@gmail\.com$/i;
 
   // 🔥 PASSWORD RULE
   const passwordRegex =

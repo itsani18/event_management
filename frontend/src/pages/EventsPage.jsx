@@ -226,7 +226,7 @@ export default function EventsPage({ role }) {
       )}
 
       {/* EVENTS */}
-      {!selected ? (
+      {selected === null ? (
         events.map((e) => {
           const id = e.id || e._id;
 
@@ -234,7 +234,10 @@ export default function EventsPage({ role }) {
             <div key={id}>
               <h3>{e.title}</h3>
 
-              <button onClick={() => handleDetails(id)}>
+              <button onClick={() => {
+                console.log("CLICKED:", e);
+                setSelected(e);
+              }}>
                 See Details
               </button>
 
@@ -252,10 +255,14 @@ export default function EventsPage({ role }) {
           );
         })
       ) : (
-        <div>
-          <button onClick={() => setSelected(null)}>Back</button>
+        <div style={{ border: "2px solid black", padding: "20px", marginTop: "20px" }}>
+          <button onClick={() => setSelected(null)}>⬅ Back</button>
 
-          <h2>{selected.title}</h2>
+          <h1>{selected.title}</h1>
+          <p><b>Description:</b> {selected.description}</p>
+          <p><b>Type:</b> {selected.type}</p>
+          <p><b>Date:</b> {selected.date}</p>
+          <p><b>Seats Left:</b> {selected.seatsLeft}</p>
 
           <button onClick={handleRegisterClick}>
             Register
