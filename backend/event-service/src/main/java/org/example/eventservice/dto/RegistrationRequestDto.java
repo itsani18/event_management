@@ -1,13 +1,17 @@
 package org.example.eventservice.dto;
 
 public class RegistrationRequestDto {
-
+    private String name;
     private String email;
 
     public RegistrationRequestDto() {}
-
+    public String getName(){ return name ;}
     public String getEmail() {
         return email;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
     public void setEmail(String email) {

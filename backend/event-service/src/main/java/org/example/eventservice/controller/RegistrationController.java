@@ -25,6 +25,7 @@ public class RegistrationController {
     ) {
         Registration reg = registrationService.register(
                 eventId,
+                dto.getName(),
                 dto.getEmail()
         );
 

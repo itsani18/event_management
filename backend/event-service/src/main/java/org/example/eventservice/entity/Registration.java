@@ -15,6 +15,7 @@ public class Registration {
     private String registrationId;
 
     private String eventId;
+    private String name;
     private String email;
     private LocalDateTime registrationDate;
 
@@ -35,6 +36,8 @@ public class Registration {
     public void setEventId(String eventId) {
         this.eventId = eventId;
     }
+
+    public void setName(String name){this.name=name;}
 
     public String getEmail() {
         return email;

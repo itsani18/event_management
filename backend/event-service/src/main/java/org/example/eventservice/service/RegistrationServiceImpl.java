@@ -20,7 +20,7 @@ public class RegistrationServiceImpl implements RegistrationService {
     private final RegistrationRepository registrationRepository;
 
     private static final Pattern EMAIL_REGEX =
-            Pattern.compile("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$");
+            Pattern.compile("^[a-zA-Z0-9._%+-]+@gmail\\.com$", Pattern.CASE_INSENSITIVE);
 
     public RegistrationServiceImpl(EventRepository eventRepository,
                                    RegistrationRepository registrationRepository) {
@@ -30,13 +30,17 @@ public class RegistrationServiceImpl implements RegistrationService {
 
     @Override
     @Transactional
-    public Registration register(String eventId, String email) {
+    public Registration register(String eventId, String name,String email) {
 
-        // ✅ 1. EMAIL VALIDATION
-        if (email == null || !EMAIL_REGEX.matcher(email).matches()) {
-            throw new IllegalArgumentException("Invalid email format");
+        if (name == null || name.trim().isEmpty()) {
+            throw new IllegalArgumentException("Name cannot be empty");
         }
 
+        // ✅ 1. EMAIL VALIDATION
+        // ✅ EMAIL VALIDATION (GMAIL ONLY)
+        if (email == null || !EMAIL_REGEX.matcher(email).matches()) {
+            throw new IllegalArgumentException("Invalid email format (must be @gmail.com)");
+        }
         // ✅ 2. CHECK EVENT EXISTS
         Event event = eventRepository.findById(eventId)
                 .orElseThrow(() -> new EventNotFound("Event not found"));
@@ -58,6 +62,7 @@ public class RegistrationServiceImpl implements RegistrationService {
         Registration registration = new Registration();
         registration.setRegistrationId(java.util.UUID.randomUUID().toString());
         registration.setEventId(eventId);
+        registration.setName(name);
         registration.setEmail(email);
         registration.setRegistrationDate(LocalDateTime.now());
 

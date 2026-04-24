@@ -49,7 +49,7 @@ export const signup = async (data) => {
 };
 
 // ================= REGISTRATION =================
-export const registerEvent = async (eventId, email, token) => {
+export const registerEvent = async (eventId, name, email, token) => {
   const res = await fetch(
     `${BASE_URL}/events/${eventId}/registration`,
     {
@@ -58,7 +58,10 @@ export const registerEvent = async (eventId, email, token) => {
         "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
       },
-      body: JSON.stringify({ email }),
+      body: JSON.stringify({
+        name,
+        email
+      }),
     }
   );
 
