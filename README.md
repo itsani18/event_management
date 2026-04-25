@@ -16,11 +16,11 @@ Users can view events (public), register, and authenticate using JWT.
 - **API Gateway** → routes all requests  
 - **Auth Service** → authentication (JWT)  
 - **Event Service** → events & registrations  
-- **MySQL** → persistent storage  
+- **PostgreSQL** → persistent storage  
 - **Frontend (React + Vite)** → UI  
 
 **Flow:**  
-Frontend → API Gateway → (Auth / Event Services) → MySQL
+Frontend → API Gateway → (Auth / Event Services) → PostgreSQL
 
 
 
@@ -30,7 +30,7 @@ Frontend → API Gateway → (Auth / Event Services) → MySQL
 - Java (Spring Boot)
 - Spring Cloud Gateway
 - JWT
-- MySQL
+- PostgreSQL
 
 **Frontend**
 - React + Vite
@@ -77,28 +77,41 @@ Frontend → API Gateway → (Auth / Event Services) → MySQL
 
 
 
-**Complete Run Setup**
-Terminal 1 - Event service
+**Complete Run Setup** :
+
+Terminal 1 - Event service :
+
 cd backend/event-service
+
 mvn spring-boot:run
+
 Runs On : http://localhost:8081
 
-Terminal 2 - Auth Service
+Terminal 2 - Auth Service :
+
 cd backend/auth-service
-mnv spring-boot:run
+
+mvn spring-boot:run
+
 Runs On : http://localhost:8082
 
-Terminal 3 - API Gateway
+Terminal 3 - API Gateway :
+
 cd backend/api-gateway
-mnv spring-boot:run
+
+mvn spring-boot:run
+
 Runs On : http://localhost:8080
 
-Terminal 4 - Frontend
+Terminal 4 - Frontend :
+
 cd frontend
+
 npm install
+
 npm run dev
 
-### 1. Clone
+###  Get the Code :
 ```bash
 git clone https://github.com/<your-username>/event_management.git
 cd event_management
