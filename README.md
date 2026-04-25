@@ -7,8 +7,7 @@ Users can view events (public), register, and authenticate using JWT.
 
 ## 🌐 Live Demo
 
-Frontend: https://<your-vercel-project>.vercel.app  
-Backend API (Gateway): https://eventsphere-production-749e.up.railway.app  
+ Live Demo: event-management-cloud.vercel.app
 
 
 
@@ -38,7 +37,7 @@ Frontend → API Gateway → (Auth / Event Services) → MySQL
 
 **Deployment**
 - Frontend: Vercel  
-- Backend + DB: Railway
+- Backend + DB: Render
 
 
 
