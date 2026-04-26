@@ -7,7 +7,8 @@ Users can view events (public), register, and authenticate using JWT.
 
 ## 🌐 Live Demo
 
- Live Demo: event-management-cloud.vercel.app
+ Live Demo:
+ event-management-cloud.vercel.app
 
 
 
