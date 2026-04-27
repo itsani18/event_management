@@ -1,18 +1,18 @@
-# 🚀 Event Management System (Microservices)
+#  Event Management System (Microservices)
 
 A full-stack Event Management application built using a microservices architecture.  
 Users can view events (public), register, and authenticate using JWT.
 
 
 
-## 🌐 Live Demo
+##  Live Demo
 
  Live Demo:
- event-management-cloud.vercel.app
+ ## event-management-cloud.vercel.app
 
 
 
-## 🧱 Architecture
+##  Architecture
 
 - **API Gateway** → routes all requests  
 - **Auth Service** → authentication (JWT)  
@@ -42,7 +42,7 @@ Frontend → API Gateway → (Auth / Event Services) → PostgreSQL
 
 
 
-## ✨ Features
+##  Features
 
 - View events (public)
 - Create events (protected)
@@ -53,7 +53,7 @@ Frontend → API Gateway → (Auth / Event Services) → PostgreSQL
 
 
 
-## 🔐 Auth & Authorization
+##  Auth & Authorization
 
 - Auth Service issues JWT tokens (with role)
 - Services validate JWT using a filter
@@ -64,7 +64,7 @@ Frontend → API Gateway → (Auth / Event Services) → PostgreSQL
 
 
 
-## 🔌 API Endpoints
+##  API Endpoints
 
 **Auth**
 - POST /auth/login
